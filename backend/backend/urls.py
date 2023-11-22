@@ -17,11 +17,15 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path, include
 from rest_framework_simplejwt import views as jwt_views
+from django.conf import settings
+from django.conf.urls.static import static
 
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('api/',include('users.urls')),
     path('admins/',include('adminside.urls')),
+    path('event/',include('events.urls')),
+    path('post/',include('posts.urls')),
     path('subscription/', include('subscription.urls')),
 
     path('token/', 
@@ -31,3 +35,5 @@ urlpatterns = [
           jwt_views.TokenRefreshView.as_view(), 
           name ='token_refresh')
 ]
+if settings.DEBUG:
+    urlpatterns += static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
