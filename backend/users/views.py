@@ -30,6 +30,7 @@ import jwt
 from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from subscription.models import SubcribedUsers
+from django.http import Http404
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -44,6 +45,8 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
             response.data['username'] = username
             response.data['role'] = role
+            response.data['userId'] = user.id  # Include user ID in the response
+
         return response
 
 
@@ -312,4 +315,18 @@ class ResetPassword(APIView):
             return JsonResponse({'error': 'Invalid or expired reset link'}, status=400)
 
 
+class ProfileView(APIView):
+    def get(self, request):
+        username = request.query_params.get('username')  # Use query_params to get username from the request
+        print("------",username)
 
+        try:
+            profile = CustomUser.objects.get(username=username)
+            print("+++++++++++",profile)
+            serializer = UserSerializers(profile)
+            return Response(serializer.data)
+        
+            
+        except Exception as e:
+            # Handle exceptions here and return an appropriate error response
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)

@@ -14,7 +14,8 @@ class CustomTokenObtainPairSerializer(TokenObtainPairSerializer):
         # Customize the token payload here
         token['username'] = user.username
         # Add more claims if needed
-        token['role'] = get_user_role(user) 
+        token['role'] = get_user_role(user)
+        token['userId'] = user.id  # Include user ID in the token payload
 
         return token
 

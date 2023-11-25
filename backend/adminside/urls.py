@@ -9,7 +9,10 @@ from . import views
 
 urlpatterns = [
     path('users/', UserList.as_view(), name='user-list'),
+    path('event-boooking/', EventBookingView.as_view(), name='event_booking'),
     path('subscription-list/', SubscriptionListView.as_view() ,name='subscription-list'),
+    path('event-list/', EventListView.as_view() ,name='event_list'),
+
     path('block-user/<int:user_id>/', BlockUser.as_view(), name='block_user'),
     path('unblock-user/<int:user_id>/', UnBlockUser.as_view(), name='block_user'),
     

@@ -5,6 +5,7 @@ from users.models import CustomUser
 from subscription.models import SubcribedUsers
 from .serializer import *
 from django.shortcuts import get_object_or_404
+from events.models import *
 
 # Create your views here.
 from rest_framework.response import Response
@@ -77,5 +78,28 @@ class UnBlockUser(APIView):
             user.save()
 
             return JsonResponse({'message': f'User {user.username} blocked successfully'})
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        
+    
+class EventBookingView(APIView):
+    def get(self,request):
+        try:
+            event_booking = Booking.objects.all()
+
+            serializer = BookingSerializer(event_booking, many=True)
+
+            return Response(serializer.data)
+        except Exception as e:
+            return JsonResponse({'error': str(e)}, status=500)
+        
+    
+class EventListView(APIView):
+    def get(self,request):
+        try:
+            event_list = Event.objects.all()
+
+            serializer = EventSerializer(event_list ,many=True) 
+            return Response(serializer.data)
         except Exception as e:
             return JsonResponse({'error': str(e)}, status=500)

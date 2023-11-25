@@ -26,6 +26,7 @@ urlpatterns = [
     path('admins/',include('adminside.urls')),
     path('event/',include('events.urls')),
     path('post/',include('posts.urls')),
+    path('chat/',include('chat.urls')),
     path('subscription/', include('subscription.urls')),
 
     path('token/', 

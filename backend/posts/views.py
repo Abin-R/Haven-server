@@ -36,15 +36,15 @@ class CreatePost(APIView):
             post =  EventPosting (
                 
                 description = description,
-                location = location,
+                completionStatus = location,
                 image = image,
                 event =  event,
                 user = organizer
             )
-            print(post)
+            print("---------",post)
 
             # Save the object to the database
-            event.save()
+            post.save()
 
             return Response({'message': 'Country created successfully'}, status=status.HTTP_201_CREATED)# Deserialize the request data using the EventSerializer
 

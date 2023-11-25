@@ -2,8 +2,11 @@
 
 from rest_framework import serializers
 from .models import *
+from posts.models import *
 
 class EventSerializer(serializers.ModelSerializer):
+    is_in_event_posting = serializers.SerializerMethodField()
+
     class Meta:
         model = Event
         fields = (
@@ -17,28 +20,34 @@ class EventSerializer(serializers.ModelSerializer):
             'organizer',
             'category',
             'image',
+            'is_in_event_posting',  # Include the new field in the serialized output
         )
+
+    def get_is_in_event_posting(self, obj):
+        # Check if there are any EventPosting instances related to the current Event
+        return EventPosting.objects.filter(event=obj).exists()
+
 
 # serializers.py
 
 from rest_framework import serializers
 from .models import *
 
-class EventSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = Event
-        fields = (
-            'id',
-            'title',
-            'description',
-            'start_date',
-            'end_date',
-            'cost',
-            'location',
-            'organizer',
-            'category',
-            'image',
-        )
+# class EventSerializer(serializers.ModelSerializer):
+#     class Meta:
+#         model = Event
+#         fields = (
+#             'id',
+#             'title',
+#             'description',
+#             'start_date',
+#             'end_date',
+#             'cost',
+#             'location',
+#             'organizer',
+#             'category',
+#             'image',
+#         )
 
 class TransactionSerializer(serializers.ModelSerializer):
     class Meta:
