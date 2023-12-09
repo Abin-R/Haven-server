@@ -10,6 +10,7 @@ from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from rest_framework.views import APIView
 from events.serializers import *
+from django.views.decorators.csrf import csrf_exempt
 
 
 # Create your views here.
@@ -110,3 +111,9 @@ class UserPostsView(generics.ListAPIView):
         print(user)
         # Fetch events associated with the currently authenticated user
         return EventPosting.objects.filter(user=user)
+    
+@csrf_exempt
+def get_images(request):
+    images = Image.objects.all()
+    image_urls = [image.image.url for image in images]
+    return JsonResponse({'imageUrls': image_urls})

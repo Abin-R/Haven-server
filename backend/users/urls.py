@@ -16,6 +16,8 @@ urlpatterns = [
     path('forgot_password_mail/<str:uidb64>/<str:token>/', views.forgot_password_mail_view, name='forgot_password_mail'),
     path('google-auth/', GoogleAuthAPIView.as_view(), name='google-auth'),
     path('profiles/', ProfileView.as_view(), name='profile-view'),
+    path('upload-profile-image/', upload_profile_image, name='upload_profile_image'),
+     path('profile-update', update_profile, name='update_profile'),
     # path('login', LoginView.as_view()),
     path('token/', 
           CustomTokenObtainPairView.as_view(), 

@@ -1,0 +1,17 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <title>Subscription Renewed</title>
+</head>
+<body>
+    <p>Dear {{ user.username }},</p>
+    <p>Your subscription has been successfully renewed. Thank you for choosing our service!</p>
+    <p>Subscription details:</p>
+    <ul>
+        <li>Subscription Type: {{ subscription.subscription.subscription_type }}</li>
+        <li>Amount: ${{ subscription.amount }}</li>
+        <!-- Add more subscription details as needed -->
+    </ul>
+    <p>Best regards,<br>Your Company</p>
+</body>
+</html>

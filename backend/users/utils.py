@@ -8,6 +8,7 @@ def get_user_role(user):
     except SubcribedUsers.DoesNotExist:
         sub = None
 
+    
     if user.is_superuser:
         return 'admin'
     elif sub and sub.is_premium:
@@ -16,3 +17,16 @@ def get_user_role(user):
         return 'super'
     else:
         return 'user'
+    
+
+def get_is_reneue(user):
+    try:
+        sub = SubcribedUsers.objects.get(user=user)
+    except SubcribedUsers.DoesNotExist:
+        sub = None
+
+    if sub and sub.is_reneue:
+        return 'reneue'
+    else:
+        return 'renued'    
+

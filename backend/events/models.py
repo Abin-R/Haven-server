@@ -12,6 +12,8 @@ class Event(models.Model):
     organizer = models.ForeignKey(SubcribedUsers, on_delete=models.CASCADE)
     category = models.CharField(max_length=100)
     image = models.ImageField(upload_to='event_images/', null=True, blank=True)
+    ticket_count = models.PositiveIntegerField(default=0 ,null=True ,blank=True )
+    is_approved = models.BooleanField(default=False ,null=True ,blank=True)   # Add this line
 
     def __str__(self):
         return self.title
@@ -40,7 +42,11 @@ class Transaction(models.Model):
     def __str__(self):
         return f'Transaction {self.pk} - {self.user} for {self.event}'
 
-
+    @classmethod
+    def get_total_amount(cls):
+        # Get the sum of all amounts
+        total_amount = cls.objects.aggregate(models.Sum('amount'))['amount__sum']
+        return total_amount if total_amount else 0
 
 
 class Booking(models.Model):
@@ -52,7 +58,7 @@ class Booking(models.Model):
 
     user = models.ForeignKey(CustomUser, on_delete=models.CASCADE)
     event = models.ForeignKey(Event, on_delete=models.CASCADE)
-    
+    ticket_count = models.PositiveIntegerField(default=1)  
     transaction = models.ForeignKey(Transaction ,on_delete=models.CASCADE)
     booking_status = models.CharField(max_length=20, choices=booking_status_choices)
     

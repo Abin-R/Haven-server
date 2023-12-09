@@ -8,15 +8,19 @@ from rest_framework import status
 from rest_framework.permissions import IsAuthenticated
 from rest_framework import generics
 from posts.serializers import *
+from datetime import datetime
 
 
 # Create your views here.
 
 class EventtView(APIView):
     def get(self, request):
-        event = Event.objects.all()
-        serializer = EventSerializer(event, many=True)
-        return Response(serializer.data)
+        current_datetime = datetime.now()
+        # Filter events that are approved by an admin
+        events = Event.objects.filter(end_date__gte=current_datetime, is_approved=True)
+        print(events)
+        serializer = EventSerializer(events, many=True)
+        return Response(serializer.data)   
 
 class EventDetailView(APIView):
     def get(self, request, event_id):
@@ -30,7 +34,7 @@ class EventDetailView(APIView):
 
 class EventCreateView(APIView):
     permission_classes = [IsAuthenticated]
-    print("---------")
+
     def post(self, request):
         try:
             print(request.data)
@@ -83,36 +87,47 @@ class UserEventsView(generics.ListAPIView):
         # Fetch events associated with the currently authenticated user
         return Event.objects.filter(organizer=user).order_by('-id')
 
+from rest_framework.views import APIView
+from rest_framework.response import Response
+from rest_framework import status
+from .models import Event, Booking, Transaction
+from django.shortcuts import get_object_or_404
+
 class CreateBookingView(APIView):
     def post(self, request):
         try:
-            print("----------")
             event_title = request.data.get('event').strip()
             prices = request.data.get('prices')
-            print(event_title)
+            ticket_count = request.data.get('ticket', 1)  # Default to 1 if not provided
 
             # Fetch the Event by title (case-insensitive)
-            a = Event.objects.get(title__iexact=event_title)
-            print(a)
+            event = get_object_or_404(Event, title__iexact=event_title)
+
+            # Ensure there are enough tickets available
+            if event.ticket_count < ticket_count:
+                return Response({'error': 'Not enough tickets available'}, status=status.HTTP_400_BAD_REQUEST)
 
             # Create a new transaction
             transaction = Transaction.objects.create(
                 user=request.user,
-                event = a,
+                event=event,
                 amount=prices,
                 transaction_type='PAYMENT',
-                status='PENDING',
+                status='SUCCESS',
             )
-            print("Transaction created:", transaction)
 
             # Create a new booking
             booking = Booking.objects.create(
                 user=request.user,
-                event=a,
+                event=event,
                 transaction=transaction,
                 booking_status='PENDING',
+                ticket_count = ticket_count,
             )
-            print("Booking created:", booking)
+
+            # Reduce the ticket count
+            event.ticket_count -= ticket_count
+            event.save()
 
             return Response({'booking_id': booking.id}, status=status.HTTP_201_CREATED)
         except Event.DoesNotExist:
@@ -120,6 +135,7 @@ class CreateBookingView(APIView):
         except Exception as e:
             print("Error:", str(e))
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
 
 
 class AttendeesForEventView(generics.ListAPIView):

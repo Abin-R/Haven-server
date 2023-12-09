@@ -31,6 +31,11 @@ from rest_framework_simplejwt.tokens import RefreshToken
 from django.core.mail import send_mail
 from subscription.models import SubcribedUsers
 from django.http import Http404
+from rest_framework.decorators import api_view, permission_classes
+from django.views.decorators.http import require_http_methods
+from django.views.decorators.csrf import csrf_exempt
+import json
+from django.utils.html import strip_tags
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -42,10 +47,13 @@ class CustomTokenObtainPairView(TokenObtainPairView):
             username = request.data['username']
             user = CustomUser.objects.get(username=username)
             role = get_user_role(user)
+            reneue = get_is_reneue(user) 
 
             response.data['username'] = username
             response.data['role'] = role
+            response.data['reneue'] = reneue
             response.data['userId'] = user.id  # Include user ID in the response
+            response.data['profileImage'] = str(user.image.url) if user.image else None
 
         return response
 
@@ -128,7 +136,7 @@ class GoogleAuthAPIView(APIView):
                     'role':role,
                     # Add other necessary details to the response
                 }
-                print("-----------------------",username)
+               
 
                 return Response(response_data, status=status.HTTP_200_OK)
             else:
@@ -235,7 +243,7 @@ def activate(request,uidb64,token):
 
 class LogoutView(APIView):
     def post(self, request):
-        print("helooooooooooooooooooooooooooooooooooo")
+     
         try:
             refresh_token = request.data.get('refresh_token')
             print("helloooo",refresh_token)
@@ -317,16 +325,73 @@ class ResetPassword(APIView):
 
 class ProfileView(APIView):
     def get(self, request):
-        username = request.query_params.get('username')  # Use query_params to get username from the request
-        print("------",username)
+        username = request.query_params.get('username')
 
         try:
+            # Assuming there is a ForeignKey from Booking to CustomUser
             profile = CustomUser.objects.get(username=username)
-            print("+++++++++++",profile)
-            serializer = UserSerializers(profile)
-            return Response(serializer.data)
-        
+            bookings = Booking.objects.filter(user=profile)
+
+            # Serialize the user profile
+            user_serializer = UserSerializers(profile)
+
+            # Serialize the bookings
+            booking_serializer = BookingSerializer(bookings, many=True)
+
+            # Create a dictionary with both serializers' data
+            response_data = {
+                'user_profile': user_serializer.data,
+                'bookings': booking_serializer.data,
+            }
+
             
+
+            return Response(response_data)
+
+        except CustomUser.DoesNotExist:
+            return Response({'error': 'User not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Booking.DoesNotExist:
+            return Response({'error': 'Bookings not found'}, status=status.HTTP_404_NOT_FOUND)
+
         except Exception as e:
-            # Handle exceptions here and return an appropriate error response
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+
+@api_view(['POST'])
+@permission_classes([IsAuthenticated])
+def upload_profile_image(request):
+    profile = CustomUser.objects.get(username=request.user)
+    print(profile)
+
+    if 'profileImage' in request.FILES:
+        profile.image = request.FILES['profileImage']
+        profile.save()
+
+        serializer = UserProfileSerializer(profile)
+        return Response(serializer.data)
+    else:
+        return Response({'error': 'No image file provided'}, status=400)
+
+
+@csrf_exempt
+@require_http_methods(["PUT"])
+def update_profile(request):
+    try:
+        data = json.loads(request.body)
+        print(data)
+        username = data.get('username') 
+        print(username)
+        user = CustomUser.objects.filter(username=username).first()
+        # Update user fields based on the received data
+        user.username = data.get('username', user.username)
+        user.address = data.get('address', user.address)
+        user.country = data.get('country', user.country)
+        user.zipcode = data.get('zipcode', user.zipcode)
+
+        # Save the updated user
+        user.save()
+
+        return JsonResponse({'message': 'Profile updated successfully'}, status=200)
+    except Exception as e:
+        return JsonResponse({'error': str(e)}, status=500)
