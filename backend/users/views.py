@@ -188,8 +188,7 @@ class Activate(APIView):
           otp = request.data.get('otp')
           username = request.data.get('username')
           generated_otp = request.session.get('otp')
-          print("Received OTP:", otp)
-          print("Stored OTP:", generated_otp)
+        
           if otp == generated_otp:
                try:
                     
@@ -246,16 +245,16 @@ class LogoutView(APIView):
      
         try:
             refresh_token = request.data.get('refresh_token')
-            print("helloooo",refresh_token)
+          
             if not refresh_token:
                 return Response({'message': 'Refresh token is missing'}, status=status.HTTP_BAD_REQUEST)
             token = RefreshToken(refresh_token)
-            print("toekkkekkek",token)
+            
             token.blacklist()
 
             return Response({'message': 'Successfully logged out'}, status=status.HTTP_200_OK)
         except Exception as e:
-            print("1234567890",e)  # Add this line to print the actual error message in the console or logs
+           
             return Response({'message': 'Invalid token or an error occurred'}, status=status.HTTP_400_BAD_REQUEST)
 
 
@@ -266,7 +265,7 @@ class ForgetPasswordEmailView(APIView):
           try:
                email = request.data.get('email')   
                myuser=CustomUser.objects.get(email=email)
-               print(myuser)
+            
                
                current_site = get_current_site(request)
                email_subject = 'confirm Your email @ Haven Association'
@@ -362,7 +361,7 @@ class ProfileView(APIView):
 @permission_classes([IsAuthenticated])
 def upload_profile_image(request):
     profile = CustomUser.objects.get(username=request.user)
-    print(profile)
+   
 
     if 'profileImage' in request.FILES:
         profile.image = request.FILES['profileImage']
@@ -379,9 +378,9 @@ def upload_profile_image(request):
 def update_profile(request):
     try:
         data = json.loads(request.body)
-        print(data)
+        
         username = data.get('username') 
-        print(username)
+      
         user = CustomUser.objects.filter(username=username).first()
         # Update user fields based on the received data
         user.username = data.get('username', user.username)

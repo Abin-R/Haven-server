@@ -53,7 +53,7 @@ class CreatePost(APIView):
                 event =  event,
                 user = organizer
             )
-            print("---------",post)
+           
 
             # Save the object to the database
             post.save()
@@ -105,10 +105,9 @@ class UserPostsView(generics.ListAPIView):
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        print(">>>>>>>>>>>>>",self.request.user)
-        print("-----------")
+        
         user = CustomUser.objects.get(username=self.request.user)
-        print(user)
+        
         # Fetch events associated with the currently authenticated user
         return EventPosting.objects.filter(user=user)
     

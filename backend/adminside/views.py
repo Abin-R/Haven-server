@@ -51,8 +51,7 @@ class UserList(APIView):
             return JsonResponse(data)
 
         except Exception as e:
-            # Print the exception for debugging
-            print(f"Exception: {e}")
+            
             return JsonResponse({'error': str(e)}, status=500)
 
 class SubscriptionListView(APIView):
@@ -113,7 +112,7 @@ class EventBookingView(APIView):
     def get(self,request):
         try:
             event_booking = Booking.objects.all().order_by('-id')
-            print(event_booking)
+          
 
             serializer = BookingSerializers(event_booking, many=True)
 
@@ -147,7 +146,7 @@ class EventListView(APIView):
     def get(self,request):
         try:
             event_list = Event.objects.all().order_by('-id')
-            print(event_list)
+            
 
             serializer = EventSerializerss(event_list,many=True) 
             return Response(serializer.data)
@@ -194,8 +193,7 @@ class AdminDashboard(APIView):
             latest_subscribed_users = SubscriptionPayment.objects.all().order_by('-timestamp')[:3]
 
 
-            # Add print statements for debugging
-            print("Latest Subscribed Users:", latest_subscribed_users)
+  
 
             users_serializer = SubscriptionPaymentSerializer(latest_subscribed_users, many=True)
 
@@ -213,7 +211,7 @@ class AdminDashboard(APIView):
                 'booking':booking_serializer.data,
             })
         except Exception as e:
-            print(e)
+           
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 class SalesDataView(APIView):
@@ -239,7 +237,7 @@ class SalesDataView(APIView):
 
             return JsonResponse(response_data)
         except Exception as e:
-            print(e)
+            
             return JsonResponse({'error': str(e)}, status=500)
         
 
@@ -249,24 +247,23 @@ class RenewSubscriptionView(APIView):
         try:
             # Get the subscription by ID
             subscription = SubscriptionPayment.objects.get(id=subscription_id)
-            print(subscription)
-            print(f"Timestamp: {subscription.timestamps}")
+            
 
             # Check if the subscription is valid (not expired)
             if subscription.is_subscription_valid():
-                print("--------------------")
+                
                 # Renew the subscription (you may need to implement the `renew` method in your model)
                 subscribed_members = SubcribedUsers.objects.get(user=subscription.user)
 
-                print(subscribed_members)
+          
 
                 # Update the boolean field to False
                 
                 if subscribed_members.is_premium:
-                    print("hiiiii")
+                   
                     subscribed_members.is_premium =False
                 else:
-                    print("hloo")
+                    
                     subscribed_members.is_super =False
                 
                 subscribed_members.is_reneue = True
@@ -279,7 +276,6 @@ class RenewSubscriptionView(APIView):
                 subject = 'Subscription Renewed'
 
                 context = {'user': subscription.user, 'subscription': subscription}
-                print(context)
                 html_message = render_to_string('email/renewal_email.html', context)
                 plain_message = strip_tags(html_message)
                 from_email = settings.DEFAULT_FROM_EMAIL
@@ -288,7 +284,6 @@ class RenewSubscriptionView(APIView):
 
                 return Response({'message': 'Subscription renewed successfully'}, status=status.HTTP_200_OK)
             else:
-                print("Subscription is not valid")
                 return Response({'error': 'Subscription is not expired'}, status=status.HTTP_400_BAD_REQUEST)
         except SubscriptionPayment.DoesNotExist:
             return Response({'error': 'Subscription not found'}, status=status.HTTP_404_NOT_FOUND)

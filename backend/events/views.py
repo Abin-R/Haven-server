@@ -18,7 +18,7 @@ class EventtView(APIView):
         current_datetime = datetime.now()
         # Filter events that are approved by an admin
         events = Event.objects.filter(end_date__gte=current_datetime, is_approved=True)
-        print(events)
+      
         serializer = EventSerializer(events, many=True)
         return Response(serializer.data)   
 
@@ -37,7 +37,7 @@ class EventCreateView(APIView):
 
     def post(self, request):
         try:
-            print(request.data)
+         
             title = request.data.get('title')
             description = request.data.get('description')
             start_date = request.data.get('start_date')
@@ -50,7 +50,7 @@ class EventCreateView(APIView):
 
             a = SubcribedUsers.objects.get(user = organizer)
 
-            print(organizer)
+           
             # Create a new Country object
             event =  Event (
                 title = title,
@@ -63,7 +63,7 @@ class EventCreateView(APIView):
                 category =category,
                 organizer = a
             )
-            print(event)
+          
 
             # Save the object to the database
             event.save()
@@ -133,7 +133,7 @@ class CreateBookingView(APIView):
         except Event.DoesNotExist:
             return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
         except Exception as e:
-            print("Error:", str(e))
+           
             return Response({'error': str(e)}, status=status.HTTP_400_BAD_REQUEST)
 
 
