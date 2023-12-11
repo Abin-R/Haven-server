@@ -80,22 +80,18 @@ class RegisterView(APIView):
             
             
             #email confirmation for the user
-            current_site = get_current_site(request)
-            domain = current_site.domain
-
-            # Create the activation link using the correct domain
-            activation_link = f'https://{domain}/api/activate/{urlsafe_base64_encode(force_bytes(myuser.pk))}/{generate_token.make_token(myuser)}'
-
-            # Continue with the email sending using the activation_link
-            email_subject = 'Confirm Your Email @ Haven'
-            message2 = render_to_string('activation_mail.html', {
-                'name': myuser.username,
-                'activation_link': activation_link,
+            current_site = get_current_site(request)    
+            email_subject = 'confirm Your email @ Haven'
+            message2 = render_to_string('activation_mail.html',{
+                'name': myuser.username ,
+                'domain': current_site.domain ,
+                'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
+                'token': generate_token.make_token(myuser),
             })
             email = EmailMessage(
-                email_subject, message2,
+                email_subject,message2,
                 settings.EMAIL_HOST_USER,
-                [myuser.email]
+                [myuser.email] 
             )
             email.fail_silently = True
             email.send()
