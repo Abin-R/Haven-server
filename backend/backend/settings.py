@@ -191,6 +191,8 @@ CORS_ALLOWED_ORIGINS = [
     "http://haven.abinr.xyz",  # Add your backend domain if necessary
 ]
 
+CSRF_TRUSTED_ORIGINS = ['http://haven-frontend.vercel.app', "http://haven.abinr.xyz",  'https://haven-frontend.vercel.app']
+
 
 DEFAULT_FROM_EMAIL = 'palletacompany@gmail.com'
 
