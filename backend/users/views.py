@@ -80,8 +80,7 @@ class RegisterView(APIView):
             
             
             #email confirmation for the user
-            current_site = get_current_site(request)  
-              
+            current_site = get_current_site(request)    
             email_subject = 'confirm Your email @ Haven'
             message2 = render_to_string('activation_mail.html',{
                 'name': myuser.username ,
