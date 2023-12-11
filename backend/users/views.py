@@ -36,6 +36,8 @@ from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
 import json
 from django.utils.html import strip_tags
+from django.urls import reverse
+
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
@@ -80,13 +82,17 @@ class RegisterView(APIView):
             
             
             #email confirmation for the user
-            current_site = get_current_site(request)    
-            email_subject = 'confirm Your email @ Haven'
-            message2 = render_to_string('activation_mail.html',{
-                'name': myuser.username ,
-                'domain': current_site.domain ,
-                'uid': urlsafe_base64_encode(force_bytes(myuser.pk)),
-                'token': generate_token.make_token(myuser),
+            # current_site = get_current_site(request)  
+            current_site = 'https://haven.abinr.xyz'  
+            activation_link = reverse('activate', kwargs={'uidb64': urlsafe_base64_encode(force_bytes(myuser.pk)),
+                                                         'token': generate_token.make_token(myuser)})
+            activation_url = f'https://{current_site}{activation_link}'
+
+            email_subject = 'Confirm Your Email @ Haven'
+            message2 = render_to_string('activation_mail.html', {
+                'name': myuser.username,
+                'domain': current_site,
+                'activation_url': activation_url,
             })
             email = EmailMessage(
                 email_subject,message2,
@@ -220,7 +226,7 @@ def activate(request,uidb64,token):
      if myuser is not None and generate_token.check_token(myuser,token):
         
         myuser.is_active=True
-        session=settings.SITE_URL + '/login'
+        session = settings.SITE_URL + '/login'
      #    return render(request,'verification_success.html')
         if myuser.date_joined > timezone.now() - timedelta(hours=24):
             myuser.save()

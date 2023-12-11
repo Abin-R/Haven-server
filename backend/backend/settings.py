@@ -179,7 +179,7 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 
-SITE_URL ='http://haven-frontend.vercel.app'
+SITE_URL ='https://haven-frontend.vercel.app'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
