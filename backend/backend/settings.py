@@ -186,12 +186,12 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://haven-frontend.vercel.app",
+    "https://haven-frontend.vercel.app",
     "ws://haven-frontend.vercel.app",
-    "http://haven.abinr.xyz",  # Add your backend domain if necessary
+    "https://haven.abinr.xyz",  # Add your backend domain if necessary
 ]
 
-CSRF_TRUSTED_ORIGINS = ['http://haven-frontend.vercel.app', "http://haven.abinr.xyz",  'https://haven-frontend.vercel.app']
+CSRF_TRUSTED_ORIGINS = ['https://haven-frontend.vercel.app', "http://haven.abinr.xyz",  'https://haven-frontend.vercel.app']
 
 
 DEFAULT_FROM_EMAIL = 'palletacompany@gmail.com'
