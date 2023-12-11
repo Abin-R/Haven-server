@@ -179,16 +179,18 @@ MEDIA_URL = '/media/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 
-SITE_URL ='http://localhost:5173'
+SITE_URL ='http://haven-frontend.vercel.app'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
 AUTH_USER_MODEL = 'users.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
-    "http://localhost:5173",
-    "ws://localhost:5173",
+    "http://haven-frontend.vercel.app",
+    "ws://haven-frontend.vercel.app",
+    "http://haven.abinr.xyz",  # Add your backend domain if necessary
 ]
+
 
 DEFAULT_FROM_EMAIL = 'palletacompany@gmail.com'
 
