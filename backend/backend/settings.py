@@ -187,8 +187,9 @@ AUTH_USER_MODEL = 'users.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
     "https://haven-frontend.vercel.app",
-    "wss://haven-frontend.vercel.app",
-    "https://haven.abinr.xyz",  # Add your backend domain if necessary
+    "ws://haven-frontend.vercel.app",
+    "https://haven.abinr.xyz",
+    "http://localhost:5173",  # Add your backend domain if necessary
 ]
 
 CSRF_TRUSTED_ORIGINS = ['https://haven-frontend.vercel.app', "https://haven.abinr.xyz",  'https://haven-frontend.vercel.app']
