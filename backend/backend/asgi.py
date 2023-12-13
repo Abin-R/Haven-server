@@ -4,19 +4,20 @@ from channels.auth import AuthMiddlewareStack
 from channels.routing import ProtocolTypeRouter, URLRouter
 
 # Setup Django before importing anything that depends on settings
-os.environ.setdefault('DJANGO_SETTINGS_MODULE', 'backend.settings')
-django_application = get_asgi_application()
+# backend/asgi.py
 
-# Now you can import other modules
-from chat.routing import websocket_urlpatterns
+from channels.auth import AuthMiddlewareStack
+from channels.routing import ProtocolTypeRouter, URLRouter
+import chat.routing
 
 application = ProtocolTypeRouter(
     {
-        "http": django_application,
+        "http": get_asgi_application(),
         "websocket": AuthMiddlewareStack(
             URLRouter(
-                websocket_urlpatterns
+                chat.routing.websocket_urlpatterns
             )
         ),
     }
 )
+
