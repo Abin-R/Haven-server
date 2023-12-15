@@ -31,41 +31,47 @@ class EventDetailView(APIView):
         except Event.DoesNotExist:
             return Response({"error": "Event not found"}, status=statistics.HTTP_404_NOT_FOUND)
     
+
 class EventCreateView(APIView):
     permission_classes = [IsAuthenticated]
 
     def post(self, request):
         try:
-            # Deserialize the request data using the EventSerializer
-            serializer = EventSerializer(data=request.data)
-            serializer.is_valid(raise_exception=True)
+         
+            title = request.data.get('title')
+            description = request.data.get('description')
+            start_date = request.data.get('start_date')
+            end_date = request.data.get('end_date')
+            location = request.data.get('location')
+            image = request.data.get('image')
+            cost = request.data.get('cost')
+            category = request.data.get('category')
+            ticket_count = request.data.get('ticket_count')
+            organizer = request.user
 
-            # Extract data from the validated serializer
-            validated_data = serializer.validated_data
+            a = SubcribedUsers.objects.get(user = organizer)
 
-            # Extract additional data from the request
-            ticket_count = request.data.get('ticket_count', 0)
-            organizer = SubcribedUsers.objects.get(user=request.user)
-
-            # Create a new Event object
-            event = Event(
-                title=validated_data['title'],
-                description=validated_data['description'],
-                start_date=validated_data['start_date'],
-                end_date=validated_data['end_date'],
-                location=validated_data['location'],
-                image=validated_data['image'],
-                cost=validated_data['cost'],
-                category=validated_data['category'],
-                organizer=organizer,
-                ticket_count=ticket_count,
+           
+            # Create a new Country object
+            event =  Event (
+                title = title,
+                description = description,
+                start_date = start_date,
+                end_date = end_date,
+                location = location,
+                image = image,
+                cost = cost,
+                category =category,
+                organizer = a,
+                ticket_count = ticket_count
             )
+          
 
             # Save the object to the database
             event.save()
 
             # Return a response indicating success
-            return Response({'message': 'Event created successfully'}, status=status.HTTP_201_CREATED)
+            return Response({'message': 'Country created successfully'}, status=status.HTTP_201_CREATED)# Deserialize the request data using the EventSerializer
 
         except Exception as e:
             import traceback
