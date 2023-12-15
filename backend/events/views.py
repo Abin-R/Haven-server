@@ -78,7 +78,47 @@ class EventCreateView(APIView):
             traceback.print_exc()  # Add this line to print the traceback
             # Handle any exceptions (log or customize error response)
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+    
+class EventEditView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request, event_id):
+        try:
+            # Fetch the event by ID
+            event = Event.objects.get(id=event_id)
+            # Serialize the event data
+            serializer = EventSerializer(event)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+
+        except Event.DoesNotExist:
+            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    def put(self, request, event_id):
+        try:
+            # Fetch the event by ID
+            event = Event.objects.get(id=event_id)
+
+            # Deserialize the request data using the EventSerializer
+            serializer = EventSerializer(instance=event, data=request.data, partial=True)
+            serializer.is_valid(raise_exception=True)
+
+            # Extract additional data from the request
+            ticket_count = request.data.get('ticket_count', 0)
+
+            # Update the event object
+            serializer.save(ticket_count=ticket_count)
+
+            # Return a response indicating success
+            return Response({'message': 'Event updated successfully'}, status=status.HTTP_200_OK)
+
+        except Event.DoesNotExist:
+            return Response({'error': 'Event not found'}, status=status.HTTP_404_NOT_FOUND)
+
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 class UserEventsView(generics.ListAPIView):
     serializer_class = EventSerializer
