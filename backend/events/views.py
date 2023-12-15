@@ -45,7 +45,7 @@ class EventCreateView(APIView):
 
             # Extract additional data from the request
             ticket_count = request.data.get('ticket_count', 0)
-            organizer = request.user
+            organizer = SubcribedUsers.objects.get(user=request.user)
 
             # Create a new Event object
             event = Event(
