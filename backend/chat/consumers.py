@@ -9,16 +9,23 @@ User = get_user_model()
 
 class ChatConsumer(AsyncWebsocketConsumer):
     async def connect(self):
-        self.room_name = "general"
-        self.room_group_name = f"chat_{self.room_name}"
+        try:
+            self.room_name = "general"
+            self.room_group_name = f"chat_{self.room_name}"
 
-        # Join room group
-        await self.channel_layer.group_add(
-            self.room_group_name,
-            self.channel_name
-        )
+            # Join room group
+            await self.channel_layer.group_add(
+                self.room_group_name,
+                self.channel_name
+            )
 
-        await self.accept()
+            await self.accept()
+        except Exception as e:
+            print(f"Error in connect method: {e}")
+            # Add additional handling if needed
+        else:
+            print("Connection successful")
+
 
     async def disconnect(self, close_code):
         # Leave room group

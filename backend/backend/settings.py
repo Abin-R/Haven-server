@@ -190,6 +190,7 @@ CORS_ALLOWED_ORIGINS = [
     'https://haven-frontend.vercel.app',
     "wss://haven-frontend.vercel.app",
     "https://haven.abinr.xyz",
+    "wss://localhost:5173",
     "http://localhost:5173",  # Add your backend domain if necessary
 ]
 
