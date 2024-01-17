@@ -172,9 +172,11 @@ USE_TZ = True
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/4.2/howto/static-files/
 
-STATIC_URL = 'static/'
+STATIC_URL = 'https://haven.abinr.xyz/static/'
+
 MEDIA_ROOT = os.path.join(BASE_DIR, 'media')
-MEDIA_URL = '/media/'
+MEDIA_URL = 'https://haven.abinr.xyz/media/'
+
 
 # Default primary key field type
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
@@ -187,14 +189,18 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 AUTH_USER_MODEL = 'users.CustomUser'
 
 CORS_ALLOWED_ORIGINS = [
-    'https://haven-beta.vercel.app/',
+    'https://haven-beta.vercel.app',
     "wss://haven-frontend.vercel.app",
     "https://haven.abinr.xyz",
     "wss://localhost:5173",
-    "http://localhost:5173",  # Add your backend domain if necessary
+    "http://localhost:5173", 
 ]
 
-CSRF_TRUSTED_ORIGINS = ['https://haven-beta.vercel.app', "https://haven.abinr.xyz",  'https://haven-beta.vercel.app/']
+
+CSRF_TRUSTED_ORIGINS = [
+    'https://haven-beta.vercel.app',
+    "https://haven.abinr.xyz",
+    'https://haven-beta.vercel.app/']
 
 
 DEFAULT_FROM_EMAIL = 'palletacompany@gmail.com'
