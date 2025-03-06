@@ -34,7 +34,7 @@ from django.http import Http404
 from rest_framework.decorators import api_view, permission_classes
 from django.views.decorators.http import require_http_methods
 from django.views.decorators.csrf import csrf_exempt
-import json
+import json, razorpay
 from django.utils.html import strip_tags
 
 
@@ -57,29 +57,21 @@ class CustomTokenObtainPairView(TokenObtainPairView):
 
         return response
 
-
-
 class RegisterView(APIView):
     def post(self, request):
         try:
+            print(1)
             username = request.data.get('username')
             email = request.data.get('email')
             password = request.data.get('password')
 
-
             if CustomUser.objects.filter(username=username).exists() or CustomUser.objects.filter(email=email).exists():
                 return Response({'message': 'Username or email already exists'}, status=status.HTTP_400_BAD_REQUEST)
 
-
-            # Create a new user object
             myuser=CustomUser.objects.create_user(username=username, password=password, email=email)
-            
             myuser.is_active = False
             myuser.save()
-            
-            
-            
-            #email confirmation for the user
+
             current_site = get_current_site(request)    
             email_subject = 'confirm Your email @ Haven'
             message2 = render_to_string('activation_mail.html',{
@@ -98,7 +90,6 @@ class RegisterView(APIView):
 
             return Response({'message': 'User created successfully'}, status=status.HTTP_201_CREATED)
         except Exception as e:
-            # Handle exceptions here and return an appropriate error response
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
 
@@ -242,10 +233,8 @@ def activate(request,uidb64,token):
 
 class LogoutView(APIView):
     def post(self, request):
-     
         try:
             refresh_token = request.data.get('refresh_token')
-          
             if not refresh_token:
                 return Response({'message': 'Refresh token is missing'}, status=status.HTTP_BAD_REQUEST)
             token = RefreshToken(refresh_token)
@@ -289,19 +278,16 @@ class ForgetPasswordEmailView(APIView):
                return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
                
                
-def forgot_password_mail_view(request,uidb64,token):
-     try:
+def forgot_password_mail_view(request, uidb64, token):
+    try:
         uid=force_str(urlsafe_base64_decode(uidb64))
         myuser=CustomUser.objects.get(pk=uid)
-     except(TypeError,ValueError,OverflowError, User.DoesNotExist):
+    except(TypeError,ValueError,OverflowError, User.DoesNotExist):
         myuser=None
-    # checking the user and token doesnt has a conflict  
-     if myuser is not None and generate_token.check_token(myuser,token):
-        
-        
-          session = settings.SITE_URL + '/reset-password/?uidb64=' + uidb64
-          #    return render(request,'verification_success.html')
-          return HttpResponseRedirect(session)        
+
+    if myuser is not None and generate_token.check_token(myuser,token):
+        session = 'http://localhost:5173/reset-password/?uidb64=' + uidb64
+        return HttpResponseRedirect(session)        
      
 class ResetPassword(APIView):
      def post(self,request):
@@ -372,7 +358,6 @@ def upload_profile_image(request):
     else:
         return Response({'error': 'No image file provided'}, status=400)
 
-
 @csrf_exempt
 @require_http_methods(["PUT"])
 def update_profile(request):
@@ -394,3 +379,44 @@ def update_profile(request):
         return JsonResponse({'message': 'Profile updated successfully'}, status=200)
     except Exception as e:
         return JsonResponse({'error': str(e)}, status=500)
+
+class CreateOrder(APIView):
+    def post(self, request, *args, **kwargs):
+        try:
+            amount = request.data.get("amount")
+            razorpay_client = razorpay.Client(auth=("rzp_test_dQb1h6OwivRNsS", "lY1M7VYj2jmnQrOibpTf4cDZ"))
+
+            order = razorpay_client.order.create(dict(
+                amount=amount, 
+                currency="INR",
+                payment_capture="1",
+            ))
+            return Response({"order_id": order["id"]}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({"error": str(e)}, status=status.HTTP_400_BAD_REQUEST)
+
+class SaveSubscription(APIView):
+    def post(self, request, *args, **kwargs):
+        subscription_type = request.data.get('subscriptionType')
+        username = request.data.get('username')
+        valid_types = [CustomUser.NORMAL, CustomUser.SUPER_USER, CustomUser.PREMIUM]
+        if subscription_type not in valid_types:
+            return JsonResponse({'error': 'Invalid subscription type'}, status=400)
+
+        user = CustomUser.objects.filter(username=username).first()
+        if not user:
+            return JsonResponse({'error': 'User not found'}, status=404)
+        user.subscription_type = subscription_type
+        user.save()
+
+        subscribed_user, created = SubcribedUsers.objects.get_or_create(user=user)
+        if subscription_type in ['super', 'premium']:
+                if subscription_type == 'super':
+                    subscribed_user.is_super = True
+                elif subscription_type == 'premium':
+                    subscribed_user.is_premium = True
+                subscribed_user.is_reneue = False
+
+                subscribed_user.save()
+
+        return JsonResponse({'message': 'Subscription updated successfully', 'subscription_type': user.subscription_type})

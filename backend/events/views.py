@@ -63,7 +63,8 @@ class EventCreateView(APIView):
                 cost = cost,
                 category =category,
                 organizer = a,
-                ticket_count = ticket_count
+                ticket_count = ticket_count,
+                is_approved = True
             )
           
 

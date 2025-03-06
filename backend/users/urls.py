@@ -8,22 +8,18 @@ from . import views
 
 
 urlpatterns = [
-    path('register/', RegisterView.as_view() , name='register'),
-    path('logout/', LogoutView.as_view(), name='logout'),
-    path('activate/<uidb64>/<token>', views.activate ,name='activate'),
-    path('forgot-password/', views.ForgetPasswordEmailView.as_view(), name='forget_password'),
-    path('reset-password/', views.ResetPassword.as_view(), name='reset-password'),
-    path('forgot_password_mail/<str:uidb64>/<str:token>/', views.forgot_password_mail_view, name='forgot_password_mail'),
-    path('google-auth/', GoogleAuthAPIView.as_view(), name='google-auth'),
-    path('profiles/', ProfileView.as_view(), name='profile-view'),
-    path('upload-profile-image/', upload_profile_image, name='upload_profile_image'),
+     path('register/', RegisterView.as_view() , name='register'),
+     path('logout/', LogoutView.as_view(), name='logout'),
+     path('activate/<uidb64>/<token>', views.activate ,name='activate'),
+     path('forgot-password/', views.ForgetPasswordEmailView.as_view(), name='forget_password'),
+     path('reset-password/', views.ResetPassword.as_view(), name='reset-password'),
+     path('forgot_password_mail/<str:uidb64>/<str:token>/', views.forgot_password_mail_view, name='forgot_password_mail'),
+     path('google-auth/', GoogleAuthAPIView.as_view(), name='google-auth'),
+     path('profiles/', ProfileView.as_view(), name='profile-view'),
+     path('upload-profile-image/', upload_profile_image, name='upload_profile_image'),
      path('profile-update', update_profile, name='update_profile'),
-    # path('login', LoginView.as_view()),
-    path('token/', 
-          CustomTokenObtainPairView.as_view(), 
-          name ='token_obtain_pair'),
-     path('token/refresh/', 
-          jwt_views.TokenRefreshView.as_view(), 
-          name ='token_refresh')
-
+     path('token/', CustomTokenObtainPairView.as_view(), name ='token_obtain_pair'),
+     path('token/refresh/', jwt_views.TokenRefreshView.as_view(), name ='token_refresh'),
+     path('save-subscription/', SaveSubscription.as_view(), name='save_subscription'),
+     path('create-order/', CreateOrder.as_view(), name='create_order')
 ]
